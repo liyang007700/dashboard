@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="DashBoard Pages for Digital Sales">
+    <meta name="author" content="Young & Wilson">
+    <link rel="icon" href="img/ibm_ico.png">
+	<title>Digital Sales DashBoard</title>
+	<link href="css/global.css" rel="stylesheet">
+</head>
+<body>
+	<div class = "g-hd">
+		<div class = "m-tt">
+			<div class="f-fl">
+				<button class = "btn"><a href="#"><img src="img/Menu_title_cyan.png"></a></button>
+				<!--悬浮提示框，暂时不用
+				<div class = "btn-tooltip-tri"></div>
+				<div class = "btn-tooltip">menu</div>			-->
+			</div>
+			<div class="f-fl">
+	            <a href="https://www.ibm.com/us-en/" alt = "ibm homepage en_us">
+	                <img alt="Brand" src="img/IBM_logo.png"/>
+	            </a>
+	        </div>
+	        <div class="f-fl">
+	        	<p class = "m-tt">Data Inspector</p>
+	        </div>
+		</div>
+		
+	</div>
+	<div class = "g-sd">
+		<ul class = "m-nav">
+			<li><a href="#Dash1">Dashboard 1</a></li>
+			<li><a href="#Dash2">Dashboard 2</a></li>
+			<li><a href="#Dash3">Dashboard 3</a></li>
+			<li><a href="#Dash4">Dashboard 4</a></li>
+		</ul>
+	</div>
+	<div class = "g-bd">
+		<div class = "m-bd">
+			<h1>DashBoards</h1>
+			<div class = "content" id = "Dash1"><h2>Dashboard 1</h2></div>
+			<div class = "content" id = "Dash2"><h2>Dashboard 2</h2></div>
+			<div class = "content" id = "Dash3"><h2>Dashboard 3</h2></div>
+			<div class = "content" id = "Dash4"><h2>Dashboard 4</h2></div>
+		</div>		
+	</div>
+<script src="js/jquery-3.1.1.js"></script>
+<script src="js/echarts.min.js"></script>
+<script >
+    function formatData(timeValue,ServiceData){
+    		var result = [];
+    		for (var i = 0;i < timeValue.length;i++){
+    			result[i] = [timeValue[i],ServiceData[i]
+    			];
+    		}
+    		return result;
+    }
+	$(function(){
+		//获取屏幕可见区域的宽度
+		var screenWidth = document.body.clientWidth;
+		//在四个区域实例化四个图标实例。
+		var myChart0 = echarts.init($('#Dash1')[0]);
+		var myChart1 = echarts.init($('#Dash2')[0]);
+		var myChart2 = echarts.init($('#Dash3')[0]);
+		var myChart3 = echarts.init($('#Dash4')[0]);
+
+		var timeData = ['2016-11-23 08:30:00','2016-11-24 09:30:00','2016-11-25 10:30:00','2016-11-26 11:30:00','2016-11-27 12:30:00','2016-11-28 13:30:00','2016-11-29 14:30:00','2016-11-30 15:30:00','2016-12-01 16:30:00','2016-12-02 17:30:00','2016-12-03 18:30:00','2016-12-04 19:30:00'];
+
+		var timeValue = timeData.slice(0);//copy a new array
+		/*data.value transform*/
+			
+		timeValue.forEach(function(e,index,array){
+			//console.log(new Date(e));
+			//timeValue[index] = new Date(e);
+			var year = parseInt(e.substr(0,4)) ;
+    		var month = parseInt(e.substr(5,2)) - 1 ;
+    		var day = parseInt(e.substr(8,2)) ;
+    		var hour = parseInt(e.substr(11,2)) ;
+			timeValue[index] = Date.UTC(year,month,day,hour);
+		});
+        var x = new Date();
+        console.log(x.getTimezoneOffset());
+
+		console.log(timeValue[0]);
+
+		var ServiceCount = [11587,9047,3601,380,444,10335,12617,14167,17011,6856,6625,1536];
+        var TotalResponseTime = [15227,6780,2222,1666,373,19470,13294,15804,23493,8297,7313,1744];
+        var AverageResponseTime = [384,207,241,4361,463,684,450,341,369,368,431,476];
+
+        var ServiceCountData = formatData(timeValue,ServiceCount);
+        var TotalResponseTimeData = formatData(timeValue,TotalResponseTime);
+        var AverageResponseTimeData = formatData(timeValue,AverageResponseTime);
+        var option = {
+				    title: {
+				        text: 'Service  Request Elapsed  time  ',
+				        subtext: 'source from dev server',
+				        x: 'center',
+				        top: 10
+				    },
+				    
+				    tooltip: {//提示框组件
+				    	show:false,
+				        trigger: 'axis',
+				        axisPointer: {
+				            animation: false
+				        }
+				    },
+				    legend: {//图例组件。
+				        data:['ServiceRequestCount','Total ResponseTime','Average ResponseTime'],
+				        orient:'vertical',
+				        left: 20,
+				        x: 'left'
+				    },
+				    toolbox: {//工具栏
+				    	show:true,
+				    	showTitle:true,//是否显示提示文字
+				    	itemSize: 20,//图标大小px
+				    	itemGap: 20,//图标之间的间距
+				    	right: 20,//图标距离容器右侧距离
+				        feature: {
+				            saveAsImage: {
+				            	title:"save as\n png",
+				            },
+				        	dataZoom: {
+				        		show: false,
+				        		title: {
+				        			zoom: "zoom",
+				        			back: "zoom Undo",
+				        		},
+				        		xAxisIndex:[0,1]
+				        	}
+				        }
+				    },
+				    dataZoom: [
+				        {
+				        	type: 'inside',
+				            realtime: true,
+				            start: 0,
+				            end: 100,
+				            xAxisIndex: [0, 1]
+				        },
+				        {
+				            type: 'slider',
+				            show:true,
+				            realtime: true,
+				            start: 30,
+				            end: 70,
+				            xAxisIndex: [0, 1]
+				        }
+				    ],
+				    grid: [{
+				        left: 100,
+				        right: 100,
+				        top: 100,
+				        height: '35%'
+				    }, {
+				        left: 100,
+				        right: 100,
+				        top: '55%',
+				        height: '35%'
+				    }],
+				    xAxis : [
+				        {
+				            type : 'time',
+				            //boundaryGap : false,
+				            //axisLine: {onZero: true}
+				            //data: timeData
+				        },
+				        {
+				            gridIndex: 1,
+				            type : 'time',
+				            //boundaryGap : false,
+				            //axisLine: {onZero: true},
+				            //data: timeData,
+				            position: 'top'
+				        }
+				    ],
+				    yAxis : [
+				        {	
+				        	offset : 0,
+				            name : 'ServiceRequestCount',
+				            type : 'value',
+				 
+				        },
+				        {
+				            gridIndex: 1,
+				            name : 'TotalElapsedTime (s)',
+				            type : 'value',
+				            inverse: true,
+				            inside :true ,
+				 
+				        },
+				         {
+				            gridIndex: 1,
+				            name : 'AvgElapsedTime(ms)',
+				            type : 'value',
+				            inverse: true,
+				 
+				        }
+				    ],
+				    series : [
+				        {
+				            name:'ServiceRequestCount',
+				            type:'line',
+				            symbolSize: 4,
+				            hoverAnimation: false,
+				            data: ServiceCountData
+				        },
+				        {
+				            name:'Total ResponseTime',
+				            type:'line',
+				            xAxisIndex: 1,
+				            yAxisIndex: 1,
+				            symbolSize: 4,
+				            hoverAnimation: false,
+				            data:TotalResponseTimeData
+				        },
+				        {
+				            name:'Average ResponseTime',
+				            type:'line',
+				            xAxisIndex: 1,
+				            yAxisIndex: 2,
+				            symbolSize: 4,
+				            hoverAnimation: false,
+				            data:AverageResponseTimeData
+				        }
+				    ]
+		};
+		myChart0.setOption(option);
+		myChart1.setOption(option);
+		myChart2.setOption(option);
+		myChart3.setOption(option);
+
+		/*在按钮上绑定事件：1、改变按钮外观
+						2、左侧导航栏划出以及主区域缩放*/
+		$(".m-tt .btn").hover(function () {
+								  $(this).children().remove();//移除按钮原内容
+								  $(this).addClass('btn-hover').html("<a href=\"#\"><img src=\"img/Menu_title_white.png\"></a>");//改变按钮样式
+								  //$(".btn-tooltip").css({"display": "block"});
+								  //$(".btn-tooltip-tri").css("display","block");
+								  $(".g-sd").addClass("z-show");//左侧导航栏滑出。
+								  $(".g-bd").addClass("z-zoom");//主内容缩放适应。
+								},
+							function () {
+								  $(this).children().remove();//移除按钮原内容
+								  $(this).removeClass('btn-hover').html("<a href=\"#\"><img src=\"img/Menu_title_cyan.png\"></a>");//改变按钮样式
+								  //$(".btn-tooltip").css({"display": "none"});
+								  //$(".btn-tooltip-tri").css("display","none");
+								  $(".g-sd").removeClass("z-show");//左侧导航栏滑入。
+								  $(".g-bd").removeClass("z-zoom");//主内容扩展适应。
+								});
+		/*在导航栏列表上获得鼠标聚焦。*/
+		$(".m-nav li").hover(function (e){
+								//列表li获得聚焦
+    							$(e.target).parent().siblings().removeClass("z-sel");
+        						$(e.target).parent().addClass("z-sel");
+        						//列表内容<a>获得聚焦
+        						$(e.target).addClass("z-sel");
+    									},
+    					   function (e){
+    					   		//列表li取消聚焦
+        						$(e.target).parent().removeClass("z-sel");
+        						//列表内容<a>取消聚焦
+        						$(e.target).removeClass("z-sel");
+    					   });	
+
+    	$(".g-sd").hover(function (e){
+								$(this).addClass("z-show");//鼠标位于导航栏，导航栏保持滑出。
+								$(".g-bd").addClass("z-zoom");//鼠标位于导航栏，主区域保持缩放。
+    									},
+	    					   function (e){
+	        					$(this).removeClass("z-show");	//鼠标离开导航栏，导航栏滑入。
+	        					$(".g-bd").removeClass("z-zoom");//鼠标离开导航栏，主区域扩展。
+	    					   });
+	});
+</script>
+</body>
+</html>
